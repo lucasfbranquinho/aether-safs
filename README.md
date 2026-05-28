@@ -26,9 +26,9 @@ O AETHER 2.0 (Autonomous Exploration & Terrain Handling Emergency Rover) e um si
 
 **Pre-requisitos:** JDK 21+ e Maven instalados.
 
-```bash
-# Compilar o projeto
-mvn compile
+```powershell
+# Configurar o Java (necessario toda vez que abrir o terminal)
+$env:JAVA_HOME = "C:\Users\lucas\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot"
 
 # Compilar e executar
 mvn compile exec:java
