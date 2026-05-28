@@ -9,14 +9,14 @@ import br.com.fiap.space.domain.valueobject.NivelEnergia;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoverEntregaKit extends Rover {
+public class SondaMineradora extends Sonda {
 
     private CompartimentoKits compartimentoKits;
     private final List<Recurso> kitsCarregados;
     private int entregasRealizadas;
 
-    public RoverEntregaKit(String idRover, NivelEnergia bateria, Coordenada posicaoInicial, double capacidadeCarga) {
-        super(idRover, bateria, posicaoInicial);
+    public SondaMineradora(String idSonda, NivelEnergia bateria, Coordenada posicaoInicial, double capacidadeCarga) {
+        super(idSonda, bateria, posicaoInicial);
         this.compartimentoKits = new CompartimentoKits(0, capacidadeCarga);
         this.kitsCarregados = new ArrayList<>();
         this.entregasRealizadas = 0;
@@ -25,7 +25,7 @@ public class RoverEntregaKit extends Rover {
     public void carregarKit(Recurso recurso) throws CargaExcedidaException {
         this.compartimentoKits = compartimentoKits.adicionarKit(recurso.getPesoKg());
         kitsCarregados.add(recurso);
-        System.out.println("[" + getIdRover() + "] Kit carregado: " + recurso.getDescricao()
+        System.out.println("[" + getIdSonda() + "] Kit carregado: " + recurso.getDescricao()
                 + " | Carga atual: " + compartimentoKits);
     }
 
@@ -33,7 +33,7 @@ public class RoverEntregaKit extends Rover {
     protected void validarTerreno(Terreno terreno) throws TerrenoInvalidoException {
         if (terreno == Terreno.SUBMERSO) {
             throw new TerrenoInvalidoException(
-                "Rover de entrega nao navega em area totalmente submersa! Use um drone aquatico."
+                "Sonda de entrega nao navega em area totalmente submersa! Use um drone aquatico."
             );
         }
     }
@@ -57,7 +57,7 @@ public class RoverEntregaKit extends Rover {
 
     @Override
     protected String getRelatorio() {
-        return String.format("RoverEntregaKit | Entregas realizadas: %d | Carga: %s",
+        return String.format("SondaMineradora | Entregas realizadas: %d | Carga: %s",
                 entregasRealizadas, compartimentoKits);
     }
 

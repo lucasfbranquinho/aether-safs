@@ -1,0 +1,233 @@
+@startuml AETHER 2.0 - Domain Layer
+
+title AETHER 2.0 - Diagrama de Classes (Domain Layer)\nSurface Autonomous Fleet System (SAFS)\nFIAP Global Solution 2026
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #1e1e1e
+skinparam class {
+    BackgroundColor #2d2d2d
+    BorderColor #e8730a
+    ArrowColor #e8730a
+    FontColor #ffffff
+    HeaderBackgroundColor #e8730a
+    HeaderFontColor #ffffff
+}
+skinparam note {
+    BackgroundColor #3a3a3a
+    BorderColor #e8730a
+    FontColor #ffffff
+}
+skinparam stereotype {
+    CBackgroundColor #444444
+    CBorderColor #e8730a
+    IBackgroundColor #444444
+    IBorderColor #88aaff
+    EBackgroundColor #444444
+    EBorderColor #aaffaa
+}
+
+' =====================
+' INTERFACE
+' =====================
+interface Recarregavel {
+    + conectarBase() : void
+}
+
+' =====================
+' ABSTRACT ENTITY - SONDA
+' =====================
+abstract class Sonda {
+    - idSonda : String
+    - bateria : NivelEnergia
+    - posicaoAtual : Coordenada
+    - terrenoAtual : Terreno
+    - status : String
+    --
+    + {final} executarRotinaAutonoma(destino, terreno) : void
+    + mover(destino : Coordenada, terreno : Terreno) : void
+    + conectarBase() : void
+    # {abstract} realizarAcaoLocal() : void
+    # {abstract} getRelatorio() : String
+    # validarTerreno(terreno : Terreno) : void
+}
+
+note top of Sonda
+  <<Template Method>>
+  executarRotinaAutonoma():
+  1. validarSistema()
+  2. mover()
+  3. realizarAcaoLocal() <<hook>>
+  4. enviarRelatorio()
+end note
+
+' =====================
+' SUBCLASSES
+' =====================
+class SondaMineradora {
+    - compartimentoKits : CompartimentoKits
+    - kitsCarregados : List<Recurso>
+    - entregasRealizadas : int
+    --
+    + carregarKit(recurso : Recurso) : void
+    # realizarAcaoLocal() : void
+    # getRelatorio() : String
+    # validarTerreno(terreno : Terreno) : void
+}
+
+class SondaExploradora {
+    - alcanceSensor : double
+    - areasMapeadas : List<String>
+    - fotosCapturadas : int
+    --
+    + getAreasMapeadas() : List<String>
+    # realizarAcaoLocal() : void
+    # getRelatorio() : String
+}
+
+' =====================
+' VALUE OBJECTS
+' =====================
+class Coordenada <<Value Object>> {
+    - eixoX : int
+    - eixoY : int
+    --
+    + distanciaAte(destino : Coordenada) : double
+    + getEixoX() : int
+    + getEixoY() : int
+}
+
+class NivelEnergia <<Value Object>> {
+    - capacidadeAtual : double
+    - capacidadeMaxima : double
+    --
+    + consumir(quantidade : double) : NivelEnergia
+    + recarregarCompleto() : NivelEnergia
+    + getPercentual() : double
+}
+
+class CompartimentoKits <<Value Object>> {
+    - volumeOcupado : double
+    - volumeMaximo : double
+    --
+    + adicionarKit(pesoKit : double) : CompartimentoKits
+    + esvaziar() : CompartimentoKits
+    + estaVazio() : boolean
+    + estaCheia() : boolean
+    + getCapacidadeRestante() : double
+}
+
+' =====================
+' ENUMS
+' =====================
+enum Recurso <<Enum>> {
+    AGUA
+    KIT_MEDICO
+    COMIDA
+    RADIO
+    --
+    - descricao : String
+    - pesoKg : double
+    --
+    + getDescricao() : String
+    + getPesoKg() : double
+}
+
+enum Terreno <<Enum>> {
+    PLANICIE
+    ALAGADO
+    LAMA
+    SUBMERSO
+    ESCOMBROS
+    --
+    - descricao : String
+    - multiplicadorConsumo : double
+    --
+    + getMultiplicadorConsumo() : double
+}
+
+' =====================
+' SINGLETON
+' =====================
+class CentroDeComando {
+    - {static} instancia : CentroDeComando
+    - frota : List<Sonda>
+    - totalMissoesExecutadas : int
+    --
+    - CentroDeComando()
+    + {static} getInstance() : CentroDeComando
+    + registrarSonda(sonda : Sonda) : void
+    + buscarSonda(id : String) : Optional<Sonda>
+    + registrarMissaoConcluida() : void
+    + exibirStatusFrota() : void
+}
+
+note right of CentroDeComando
+  <<Singleton>>
+  Apenas uma instancia
+  controla toda a frota
+end note
+
+' =====================
+' FACTORY
+' =====================
+class SondaFactory {
+    - {static} contadorMineradora : AtomicInteger
+    - {static} contadorExploradora : AtomicInteger
+    --
+    + {static} criar(tipo : String) : Sonda
+    - {static} criarSondaMineradora() : SondaMineradora
+    - {static} criarSondaExploradora() : SondaExploradora
+}
+
+note right of SondaFactory
+  <<Factory Method>>
+  criar("ENTREGA") -> SondaMineradora
+  criar("MAPEAMENTO") -> SondaExploradora
+end note
+
+' =====================
+' EXCEPTIONS
+' =====================
+class BateriaCriticaException <<Exception>> {
+    + BateriaCriticaException(message : String)
+}
+
+class CargaExcedidaException <<Exception>> {
+    + CargaExcedidaException(message : String)
+}
+
+class TerrenoInvalidoException <<Exception>> {
+    + TerrenoInvalidoException(message : String)
+}
+
+' =====================
+' RELATIONS
+' =====================
+
+' Heranca
+Sonda <|-- SondaMineradora
+Sonda <|-- SondaExploradora
+
+' Interface
+Sonda ..|> Recarregavel
+
+' Value Objects
+Sonda --> NivelEnergia : usa
+Sonda --> Coordenada : posicaoAtual
+Sonda --> Terreno : terrenoAtual
+SondaMineradora --> CompartimentoKits : tem
+SondaMineradora --> Recurso : carrega
+
+' Singleton
+CentroDeComando o-- Sonda : gerencia frota
+
+' Factory
+SondaFactory ..> SondaMineradora : cria
+SondaFactory ..> SondaExploradora : cria
+
+' Exceptions
+NivelEnergia ..> BateriaCriticaException : lanca
+CompartimentoKits ..> CargaExcedidaException : lanca
+SondaMineradora ..> TerrenoInvalidoException : lanca
+
+@enduml

@@ -1,0 +1,7 @@
+br\com\fiap\space\domain\model\CentroDeComando.class
+br\com\fiap\space\infrastructure\SondaRepositoryImpl.class
+br\com\fiap\space\domain\interfaces\SondaRepository.class
+br\com\fiap\space\infrastructure\factory\SondaFactory.class
+br\com\fiap\space\domain\model\SondaExploradora.class
+br\com\fiap\space\domain\model\Sonda.class
+br\com\fiap\space\domain\model\SondaMineradora.class

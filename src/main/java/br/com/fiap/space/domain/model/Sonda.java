@@ -6,21 +6,21 @@ import br.com.fiap.space.domain.interfaces.Recarregavel;
 import br.com.fiap.space.domain.valueobject.Coordenada;
 import br.com.fiap.space.domain.valueobject.NivelEnergia;
 
-public abstract class Rover implements Recarregavel {
+public abstract class Sonda implements Recarregavel {
 
     private static final double CONSUMO_BASE_POR_UNIDADE = 5.0;
 
-    private final String idRover;
+    private final String idSonda;
     private NivelEnergia bateria;
     private Coordenada posicaoAtual;
     private Terreno terrenoAtual;
     private String status;
 
-    protected Rover(String idRover, NivelEnergia bateria, Coordenada posicaoInicial) {
-        if (idRover == null || idRover.isBlank()) {
-            throw new IllegalArgumentException("ID do rover nao pode ser nulo ou vazio.");
+    protected Sonda(String idSonda, NivelEnergia bateria, Coordenada posicaoInicial) {
+        if (idSonda == null || idSonda.isBlank()) {
+            throw new IllegalArgumentException("ID da sonda nao pode ser nulo ou vazio.");
         }
-        this.idRover = idRover;
+        this.idSonda = idSonda;
         this.bateria = bateria;
         this.posicaoAtual = posicaoInicial;
         this.terrenoAtual = Terreno.PLANICIE;
@@ -33,7 +33,7 @@ public abstract class Rover implements Recarregavel {
     public final void executarRotinaAutonoma(Coordenada destino, Terreno terreno)
             throws BateriaCriticaException, TerrenoInvalidoException, Exception {
 
-        System.out.println("\n[AETHER-ROVER " + idRover + "] Iniciando rotina autonoma...");
+        System.out.println("\n[AETHER-SONDA " + idSonda + "] Iniciando rotina autonoma...");
 
         // Passo 1: Validar status do sistema
         validarSistema(terreno);
@@ -41,7 +41,7 @@ public abstract class Rover implements Recarregavel {
         // Passo 2: Deslocar ate a coordenada
         mover(destino, terreno);
 
-        // Passo 3: Hook - cada rover realiza sua acao especifica
+        // Passo 3: Hook - cada sonda realiza sua acao especifica
         realizarAcaoLocal();
 
         // Passo 4: Enviar relatorio ao Centro de Comando
@@ -54,7 +54,7 @@ public abstract class Rover implements Recarregavel {
         System.out.println("  [1/4] Validando sistemas...");
         if (bateria.getPercentual() < 10.0) {
             throw new BateriaCriticaException(String.format(
-                "Bateria critica (%.0f%%)! Rover nao pode iniciar missao. Recarregue antes.", bateria.getPercentual()
+                "Bateria critica (%.0f%%)! Sonda nao pode iniciar missao. Recarregue antes.", bateria.getPercentual()
             ));
         }
         validarTerreno(terreno);
@@ -88,13 +88,13 @@ public abstract class Rover implements Recarregavel {
 
     @Override
     public void conectarBase() {
-        System.out.println("[ROVER " + idRover + "] Conectando a base AETHER para recarga...");
+        System.out.println("[SONDA " + idSonda + "] Conectando a base AETHER para recarga...");
         this.bateria = bateria.recarregarCompleto();
         this.status = "STANDBY";
         System.out.println("  -> Recarga completa! Bateria: " + bateria);
     }
 
-    public String getIdRover() { return idRover; }
+    public String getIdSonda() { return idSonda; }
     public NivelEnergia getBateria() { return bateria; }
     public Coordenada getPosicaoAtual() { return posicaoAtual; }
     public Terreno getTerrenoAtual() { return terrenoAtual; }
@@ -106,6 +106,6 @@ public abstract class Rover implements Recarregavel {
     @Override
     public String toString() {
         return String.format("[%s] Pos: %s | Bateria: %s | Status: %s",
-                idRover, posicaoAtual, bateria, status);
+                idSonda, posicaoAtual, bateria, status);
     }
 }

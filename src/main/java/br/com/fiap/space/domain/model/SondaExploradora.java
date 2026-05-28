@@ -6,14 +6,14 @@ import br.com.fiap.space.domain.valueobject.NivelEnergia;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoverMapeamento extends Rover {
+public class SondaExploradora extends Sonda {
 
     private final double alcanceSensor;
     private final List<String> areasMapeadas;
     private int fotosCapturadas;
 
-    public RoverMapeamento(String idRover, NivelEnergia bateria, Coordenada posicaoInicial, double alcanceSensor) {
-        super(idRover, bateria, posicaoInicial);
+    public SondaExploradora(String idSonda, NivelEnergia bateria, Coordenada posicaoInicial, double alcanceSensor) {
+        super(idSonda, bateria, posicaoInicial);
         if (alcanceSensor <= 0) {
             throw new IllegalArgumentException("Alcance do sensor deve ser estritamente positivo.");
         }
@@ -36,7 +36,7 @@ public class RoverMapeamento extends Rover {
 
     @Override
     protected String getRelatorio() {
-        return String.format("RoverMapeamento | Areas mapeadas: %d | Fotos: %d | Alcance sensor: %.0fm",
+        return String.format("SondaExploradora | Areas mapeadas: %d | Fotos: %d | Alcance sensor: %.0fm",
                 areasMapeadas.size(), fotosCapturadas, alcanceSensor);
     }
 

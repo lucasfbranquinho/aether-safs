@@ -3,39 +3,39 @@ package br.com.fiap.space.application;
 import br.com.fiap.space.domain.exception.BateriaCriticaException;
 import br.com.fiap.space.domain.exception.CargaExcedidaException;
 import br.com.fiap.space.domain.exception.TerrenoInvalidoException;
-import br.com.fiap.space.domain.interfaces.RoverRepository;
+import br.com.fiap.space.domain.interfaces.SondaRepository;
 import br.com.fiap.space.domain.model.*;
 import br.com.fiap.space.domain.valueobject.Coordenada;
-import br.com.fiap.space.infrastructure.factory.RoverFactory;
+import br.com.fiap.space.infrastructure.factory.SondaFactory;
 
 import java.util.List;
 import java.util.Optional;
 
 public class MissaoService {
 
-    private final RoverRepository roverRepository;
-    private final CentroDeComandoAETHER centroDeComando;
+    private final SondaRepository sondaRepository;
+    private final CentroDeComando centroDeComando;
 
-    public MissaoService(RoverRepository roverRepository) {
-        this.roverRepository = roverRepository;
-        this.centroDeComando = CentroDeComandoAETHER.getInstance();
+    public MissaoService(SondaRepository sondaRepository) {
+        this.sondaRepository = sondaRepository;
+        this.centroDeComando = CentroDeComando.getInstance();
     }
 
-    public Rover lancarRover(String tipo) {
-        Rover rover = RoverFactory.criar(tipo);
-        roverRepository.salvar(rover);
-        centroDeComando.registrarRover(rover);
-        return rover;
+    public Sonda lancarSonda(String tipo) {
+        Sonda sonda = SondaFactory.criar(tipo);
+        sondaRepository.salvar(sonda);
+        centroDeComando.registrarSonda(sonda);
+        return sonda;
     }
 
-    public List<Rover> listarRovers() {
-        return roverRepository.listarTodos();
+    public List<Sonda> listarSondas() {
+        return sondaRepository.listarTodos();
     }
 
-    public void executarMissao(String idRover, int x, int y, String tipoTerreno)
+    public void executarMissao(String idSonda, int x, int y, String tipoTerreno)
             throws BateriaCriticaException, TerrenoInvalidoException, Exception {
 
-        Rover rover = buscarOuLancarErro(idRover);
+        Sonda sonda = buscarOuLancarErro(idSonda);
         Coordenada destino = new Coordenada(x, y);
         Terreno terreno;
         try {
@@ -44,16 +44,16 @@ public class MissaoService {
             throw new IllegalArgumentException("Terreno invalido: '" + tipoTerreno + "'.");
         }
 
-        rover.executarRotinaAutonoma(destino, terreno);
+        sonda.executarRotinaAutonoma(destino, terreno);
         centroDeComando.registrarMissaoConcluida();
-        roverRepository.atualizar(rover);
+        sondaRepository.atualizar(sonda);
     }
 
-    public void carregarKit(String idRover, String tipoRecurso) throws CargaExcedidaException {
-        Rover rover = buscarOuLancarErro(idRover);
-        if (!(rover instanceof RoverEntregaKit roverEntrega)) {
-            throw new IllegalStateException("Apenas RoverEntregaKit pode carregar kits! Rover selecionado e do tipo: "
-                    + rover.getClass().getSimpleName());
+    public void carregarKit(String idSonda, String tipoRecurso) throws CargaExcedidaException {
+        Sonda sonda = buscarOuLancarErro(idSonda);
+        if (!(sonda instanceof SondaMineradora sondaMineradora)) {
+            throw new IllegalStateException("Apenas SondaMineradora pode carregar kits! Sonda selecionada e do tipo: "
+                    + sonda.getClass().getSimpleName());
         }
         Recurso recurso;
         try {
@@ -61,24 +61,24 @@ public class MissaoService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Recurso invalido: '" + tipoRecurso + "'.");
         }
-        roverEntrega.carregarKit(recurso);
-        roverRepository.atualizar(rover);
+        sondaMineradora.carregarKit(recurso);
+        sondaRepository.atualizar(sonda);
     }
 
-    public void recarregarRover(String idRover) {
-        Rover rover = buscarOuLancarErro(idRover);
-        rover.conectarBase();
-        roverRepository.atualizar(rover);
+    public void recarregarSonda(String idSonda) {
+        Sonda sonda = buscarOuLancarErro(idSonda);
+        sonda.conectarBase();
+        sondaRepository.atualizar(sonda);
     }
 
     public void exibirStatusFrota() {
         centroDeComando.exibirStatusFrota();
     }
 
-    private Rover buscarOuLancarErro(String idRover) {
-        Optional<Rover> opt = roverRepository.buscarPorId(idRover);
+    private Sonda buscarOuLancarErro(String idSonda) {
+        Optional<Sonda> opt = sondaRepository.buscarPorId(idSonda);
         if (opt.isEmpty()) {
-            throw new IllegalArgumentException("Rover nao encontrado: '" + idRover + "'.");
+            throw new IllegalArgumentException("Sonda nao encontrada: '" + idSonda + "'.");
         }
         return opt.get();
     }

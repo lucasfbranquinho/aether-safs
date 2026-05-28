@@ -2,16 +2,16 @@ package br.com.fiap.space.presentation;
 
 import br.com.fiap.space.application.MissaoService;
 import br.com.fiap.space.domain.model.Recurso;
-import br.com.fiap.space.domain.model.Rover;
+import br.com.fiap.space.domain.model.Sonda;
 import br.com.fiap.space.domain.model.Terreno;
-import br.com.fiap.space.infrastructure.RoverRepositoryImpl;
+import br.com.fiap.space.infrastructure.SondaRepositoryImpl;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    private static final MissaoService missaoService = new MissaoService(new RoverRepositoryImpl());
+    private static final MissaoService missaoService = new MissaoService(new SondaRepositoryImpl());
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -21,13 +21,13 @@ public class Main {
             exibirMenu();
             opcao = lerInteiro("Escolha uma opcao: ");
             switch (opcao) {
-                case 1 -> menuLancarRover();
+                case 1 -> menuLancarSonda();
                 case 2 -> missaoService.exibirStatusFrota();
                 case 3 -> menuExecutarMissao();
                 case 4 -> menuCarregarKit();
-                case 5 -> menuRecarregarRover();
-                case 6 -> listarRovers();
-                case 0 -> System.out.println("\n[AETHER-COMMAND] Sistema encerrado. Misso cumprida.\n");
+                case 5 -> menuRecarregarSonda();
+                case 6 -> listarSondas();
+                case 0 -> System.out.println("\n[AETHER-COMMAND] Sistema encerrado. Missao cumprida.\n");
                 default -> System.out.println("[ERRO] Opcao invalida. Tente novamente.");
             }
         }
@@ -36,10 +36,10 @@ public class Main {
 
     // ===== MENUS =====
 
-    private static void menuLancarRover() {
-        System.out.println("\n--- LANCAR NOVO ROVER ---");
-        System.out.println("[1] RoverEntregaKit  - entrega kits de sobrevivencia em areas alagadas");
-        System.out.println("[2] RoverMapeamento  - mapeia areas atingidas com sensor de longo alcance");
+    private static void menuLancarSonda() {
+        System.out.println("\n--- LANCAR NOVA SONDA ---");
+        System.out.println("[1] SondaMineradora  - entrega kits de sobrevivencia em areas alagadas");
+        System.out.println("[2] SondaExploradora - mapeia areas atingidas com sensor de longo alcance");
         int escolha = lerInteiro("Tipo: ");
         String tipo = switch (escolha) {
             case 1 -> "ENTREGA";
@@ -51,8 +51,8 @@ public class Main {
             return;
         }
         try {
-            Rover rover = missaoService.lancarRover(tipo);
-            System.out.println("[OK] Rover lancado: " + rover.getIdRover());
+            Sonda sonda = missaoService.lancarSonda(tipo);
+            System.out.println("[OK] Sonda lancada: " + sonda.getIdSonda());
         } catch (IllegalArgumentException e) {
             System.out.println("[ERRO] " + e.getMessage());
         }
@@ -60,10 +60,10 @@ public class Main {
 
     private static void menuExecutarMissao() {
         System.out.println("\n--- EXECUTAR MISSAO DE RESGATE ---");
-        listarRovers();
-        if (missaoService.listarRovers().isEmpty()) return;
+        listarSondas();
+        if (missaoService.listarSondas().isEmpty()) return;
 
-        String id = lerString("ID do rover (ex: RVR-ENT-001): ").toUpperCase();
+        String id = lerString("ID da sonda (ex: SND-MIN-001): ").toUpperCase();
         int x = lerInteiro("Coordenada X do destino: ");
         int y = lerInteiro("Coordenada Y do destino: ");
 
@@ -83,11 +83,11 @@ public class Main {
     }
 
     private static void menuCarregarKit() {
-        System.out.println("\n--- CARREGAR KIT EM ROVER DE ENTREGA ---");
-        listarRovers();
-        if (missaoService.listarRovers().isEmpty()) return;
+        System.out.println("\n--- CARREGAR KIT EM SONDA MINERADORA ---");
+        listarSondas();
+        if (missaoService.listarSondas().isEmpty()) return;
 
-        String id = lerString("ID do RoverEntregaKit (ex: RVR-ENT-001): ").toUpperCase();
+        String id = lerString("ID da SondaMineradora (ex: SND-MIN-001): ").toUpperCase();
 
         System.out.println("\nRecursos disponiveis:");
         for (Recurso r : Recurso.values()) {
@@ -104,27 +104,27 @@ public class Main {
         }
     }
 
-    private static void menuRecarregarRover() {
-        System.out.println("\n--- RECARREGAR BATERIA DO ROVER ---");
-        listarRovers();
-        if (missaoService.listarRovers().isEmpty()) return;
+    private static void menuRecarregarSonda() {
+        System.out.println("\n--- RECARREGAR BATERIA DA SONDA ---");
+        listarSondas();
+        if (missaoService.listarSondas().isEmpty()) return;
 
-        String id = lerString("ID do rover: ").toUpperCase();
+        String id = lerString("ID da sonda: ").toUpperCase();
         try {
-            missaoService.recarregarRover(id);
+            missaoService.recarregarSonda(id);
         } catch (IllegalArgumentException e) {
             System.out.println("[ERRO] " + e.getMessage());
         }
     }
 
-    private static void listarRovers() {
-        List<Rover> rovers = missaoService.listarRovers();
-        if (rovers.isEmpty()) {
-            System.out.println("[INFO] Nenhum rover cadastrado. Use a opcao [1] para lancar um rover.");
+    private static void listarSondas() {
+        List<Sonda> sondas = missaoService.listarSondas();
+        if (sondas.isEmpty()) {
+            System.out.println("[INFO] Nenhuma sonda cadastrada. Use a opcao [1] para lancar uma sonda.");
             return;
         }
-        System.out.println("\n--- ROVERS CADASTRADOS (" + rovers.size() + ") ---");
-        rovers.forEach(r -> System.out.println("  " + r));
+        System.out.println("\n--- SONDAS CADASTRADAS (" + sondas.size() + ") ---");
+        sondas.forEach(s -> System.out.println("  " + s));
     }
 
     // ===== UTILITARIOS =====
@@ -151,12 +151,12 @@ public class Main {
         System.out.println("\n========================================");
         System.out.println("   AETHER-COMMAND - Menu Principal");
         System.out.println("========================================");
-        System.out.println(" [1] Lancar novo Rover (Factory)");
+        System.out.println(" [1] Lancar nova Sonda (Factory)");
         System.out.println(" [2] Status da frota (AETHER-COMMAND)");
         System.out.println(" [3] Executar missao de resgate");
-        System.out.println(" [4] Carregar kit em RoverEntregaKit");
-        System.out.println(" [5] Recarregar bateria de rover");
-        System.out.println(" [6] Listar todos os rovers");
+        System.out.println(" [4] Carregar kit em SondaMineradora");
+        System.out.println(" [5] Recarregar bateria de sonda");
+        System.out.println(" [6] Listar todas as sondas");
         System.out.println(" [0] Encerrar sistema");
         System.out.println("========================================");
     }
