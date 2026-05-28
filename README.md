@@ -178,9 +178,9 @@ O diagrama completo esta disponivel no arquivo `aether-uml.puml` na raiz do proj
 
 ## Equipe
 
-| Integrante | Responsabilidade |
-|---|---|
-| Lucas | DDD-Java, Dynamic Programming (Python), Network Architect (Cisco) |
-| Parceiro | Database Design (Oracle SQL), Agile & Squads, AR/VR Modelagem 3D |
+| Integrante | RM | Responsabilidade |
+|---|---|---|
+| Lucas Branquinho | 562262 | DDD-Java, Dynamic Programming (Python), Network Architect (Cisco) |
+| Vitor Bordalo | 561592 | Database Design (Oracle SQL), Agile & Squads, AR/VR Modelagem 3D |
 
 **Tema unificado:** Rovers autonomos de resgate climatico inspirados no programa Artemis da NASA, aplicados ao desastre do Rio Grande do Sul de maio de 2024.
